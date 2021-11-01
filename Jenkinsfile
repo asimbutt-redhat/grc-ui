@@ -18,14 +18,7 @@ pipeline {
     stages {
         stage('Build') {
             steps {                
-                sh '''
-                wget https://mirror.openshift.com/pub/openshift-v4/clients/ocp/stable/openshift-client-linux.tar.gz -O openshift-client-linux.tar.gz
-                tar xvfz openshift-client-linux.tar.gz
-                mv oc kubectl /usr/local/bin/
-                wget https://github.com/mikefarah/yq/releases/download/v4.13.2/yq_linux_amd64 -O /usr/local/bin/yq && chmod +x /usr/local/bin/yq
-                yum install epel-release -y
-                yum install jq -y
-                yum install -y xorg-x11-server-Xvfb gtk2-devel gtk3-devel libnotify-devel GConf2 nss libXScrnSaver alsa-lib         
+                sh '''       
                 npm config set unsafe-perm true                    
                 npm install
                 npm ci
