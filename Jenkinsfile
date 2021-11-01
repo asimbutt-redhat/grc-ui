@@ -1,0 +1,67 @@
+pipeline {
+    agent {
+        docker {
+            image 'quay.io/rhn_support_abutt/centos8-nodejs12'
+            args '--network host -u 0:0 -p 3000:3000'
+        }
+    }
+    parameters {
+        string(name:'OC_IDP', defaultValue: 'kube:admin', description: 'Identity Provider')
+        string(name:'OC_CLUSTER_USER', defaultValue: 'kubeadmin', description: 'OCP Hub User Name')
+        string(name:'OC_HUB_CLUSTER_PASS', defaultValue: '', description: 'OCP Hub Password')
+        string(name:'OC_HUB_CLUSTER_API_URL', defaultValue: 'https://api.apps.abutt-mycluster01.dev09.red-chesterfield.com:6443', description: 'OCP Hub API URL')
+        string(name:'BASE_URL', defaultValue: 'https://multicloud-console.apps.abutt-mycluster01.dev09.red-chesterfield.com', description: 'ACM Console Password')
+    }
+    environment {
+        CI = 'true'
+    }
+    stages {
+        stage('Build') {
+            steps {                
+                sh '''
+                wget https://mirror.openshift.com/pub/openshift-v4/clients/ocp/stable/openshift-client-linux.tar.gz -O openshift-client-linux.tar.gz
+                tar xvfz openshift-client-linux.tar.gz
+                mv oc kubectl /usr/local/bin/
+                wget https://github.com/mikefarah/yq/releases/download/v4.13.2/yq_linux_amd64 -O /usr/local/bin/yq && chmod +x /usr/local/bin/yq
+                yum install epel-release -y
+                yum install jq -y
+                yum install -y xorg-x11-server-Xvfb gtk2-devel gtk3-devel libnotify-devel GConf2 nss libXScrnSaver alsa-lib         
+                npm config set unsafe-perm true                    
+                npm install
+                npm ci
+                npx browserslist@latest --update-db
+                '''
+            }
+        }
+        stage('Test') {
+            steps {
+                sh """
+                export CYPRESS_OC_IDP="${params.OC_IDP}"
+                export CYPRESS_OC_CLUSTER_USER="${params.OC_CLUSTER_USER}"
+                export CYPRESS_OC_HUB_CLUSTER_PASS="${params.OC_HUB_CLUSTER_PASS}"
+                export CYPRESS_OC_HUB_CLUSTER_URL="${params.OC_HUB_CLUSTER_API_URL}"
+                export CYPRESS_BASE_URL="${params.BASE_URL}"
+                export CYPRESS_OPTIONS_HUB_USER="${params.OC_CLUSTER_USER}"
+                export CYPRESS_OPTIONS_HUB_PASSWORD="${params.OC_HUB_CLUSTER_PASS}"
+                export CYPRESS_RESOURCE_ID="\$(date +\"\%s\")"
+                if [[ -z "${CYPRESS_OC_CLUSTER_USER}" || -z "${CYPRESS_OC_HUB_CLUSTER_PASS}" || -z "${CYPRESS_OC_HUB_CLUSTER_URL}" ]]; then
+                    echo "Aborting test.. OCP/ACM connection details are required for the test execution"
+                    exit 1
+                else
+                    rm -rf test-output/cypress
+                    oc login --insecure-skip-tls-verify -u \$CYPRESS_OC_CLUSTER_USER -p \$CYPRESS_OC_HUB_CLUSTER_PASS \$CYPRESS_OC_HUB_CLUSTER_URL 
+                    oc get managedclusters -o custom-columns='name:.metadata.name,available:.status.conditions[?(@.reason=="ManagedClusterAvailable")].status,vendor:.metadata.labels.vendor' --no-headers | awk '/True/ { printf "%s:\n  vendor: %s\n", $1, $3 }' > ./tests/cypress/config/clusters.yaml
+                    npx cypress run --headless --spec tests/cypress/tests/RolePolicy_governance.spec.js || echo "Continuing with next test"
+                    npx cypress run --headless --spec tests/cypress/tests/Namespace_governance.spec.js 
+                fi
+                """
+            }
+        }
+    }
+    post {
+        always {
+            archiveArtifacts artifacts: 'test-output/*', followSymlinks: false
+            junit 'test-output/*.xml'
+        }
+    }
+}
