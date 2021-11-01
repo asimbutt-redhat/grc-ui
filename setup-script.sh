@@ -1,4 +1,4 @@
-#!/usr/bin/bash
+#!/usr/bin/bash -x
 
 export CYPRESS_RESOURCE_ID="${CYPRESS_RESOURCE_ID:-"$(date +"%s")"}"
 
