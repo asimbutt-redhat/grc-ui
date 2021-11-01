@@ -9,7 +9,7 @@ pipeline {
         string(name:'OC_IDP', defaultValue: 'kube:admin', description: 'Identity Provider')
         string(name:'OC_CLUSTER_USER', defaultValue: 'kubeadmin', description: 'OCP Hub User Name')
         string(name:'OC_HUB_CLUSTER_PASS', defaultValue: '', description: 'OCP Hub Password')
-        string(name:'OC_HUB_CLUSTER_API_URL', defaultValue: 'https://api.apps.abutt-mycluster01.dev09.red-chesterfield.com:6443', description: 'OCP Hub API URL')
+        string(name:'OC_HUB_CLUSTER_API_URL', defaultValue: 'https://api.abutt-mycluster01.dev09.red-chesterfield.com:6443', description: 'OCP Hub API URL')
         string(name:'BASE_URL', defaultValue: 'https://multicloud-console.apps.abutt-mycluster01.dev09.red-chesterfield.com', description: 'ACM Console Password')
     }
     environment {

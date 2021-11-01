@@ -14,7 +14,6 @@
   "supportFile": "tests/cypress/support/index.js",
   "videosFolder": "test-output/cypress/videos",
   "trashAssetsBeforeRuns": false,
-  "videoCompression": true,
   "watchForFileChanges": true,
   "nodeVersion": "system",
   "reporter": "cypress-multi-reporters",
