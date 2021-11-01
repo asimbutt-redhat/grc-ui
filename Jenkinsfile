@@ -43,7 +43,7 @@ pipeline {
                 export CYPRESS_BASE_URL="${params.BASE_URL}"
                 export CYPRESS_OPTIONS_HUB_USER="${params.OC_CLUSTER_USER}"
                 export CYPRESS_OPTIONS_HUB_PASSWORD="${params.OC_HUB_CLUSTER_PASS}"
-                export CYPRESS_RESOURCE_ID="\$(date +\"\%s\")"
+                export CYPRESS_RESOURCE_ID="\$(date +"%s")"
                 if [[ -z "${CYPRESS_OC_CLUSTER_USER}" || -z "${CYPRESS_OC_HUB_CLUSTER_PASS}" || -z "${CYPRESS_OC_HUB_CLUSTER_URL}" ]]; then
                     echo "Aborting test.. OCP/ACM connection details are required for the test execution"
                     exit 1
