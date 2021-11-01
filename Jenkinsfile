@@ -43,14 +43,12 @@ pipeline {
                 export CYPRESS_BASE_URL="${params.BASE_URL}"
                 export CYPRESS_OPTIONS_HUB_USER="${params.OC_CLUSTER_USER}"
                 export CYPRESS_OPTIONS_HUB_PASSWORD="${params.OC_HUB_CLUSTER_PASS}"
-                export CYPRESS_RESOURCE_ID=$(date +%s)
                 if [[ -z "${CYPRESS_OC_CLUSTER_USER}" || -z "${CYPRESS_OC_HUB_CLUSTER_PASS}" || -z "${CYPRESS_OC_HUB_CLUSTER_URL}" ]]; then
                     echo "Aborting test.. OCP/ACM connection details are required for the test execution"
                     exit 1
                 else
                     rm -rf test-output/cypress
-                    oc login --insecure-skip-tls-verify -u \$CYPRESS_OC_CLUSTER_USER -p \$CYPRESS_OC_HUB_CLUSTER_PASS \$CYPRESS_OC_HUB_CLUSTER_URL 
-                    oc get managedclusters -o custom-columns='name:.metadata.name,available:.status.conditions[?(@.reason=="ManagedClusterAvailable")].status,vendor:.metadata.labels.vendor' --no-headers | awk '/True/ { printf "%s:\n  vendor: %s\n", $1, $3 }' > ./tests/cypress/config/clusters.yaml
+                    ./setup-script.sh
                     npx cypress run --headless --spec tests/cypress/tests/RolePolicy_governance.spec.js || echo "Continuing with next test"
                     npx cypress run --headless --spec tests/cypress/tests/Namespace_governance.spec.js 
                 fi
