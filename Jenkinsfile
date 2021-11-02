@@ -42,6 +42,7 @@ pipeline {
                 else
                     rm -rf test-output/cypress
                     ./setup-script.sh
+                    export CYPRESS_RESOURCE_ID=\$(date +"%s")
                     npx cypress run --headless --spec tests/cypress/tests/RolePolicy_governance.spec.js || echo "Continuing with next test"
                     npx cypress run --headless --spec tests/cypress/tests/Namespace_governance.spec.js 
                 fi
