@@ -7,6 +7,7 @@ pipeline {
     }
     parameters {
         string(name:'OC_IDP', defaultValue: 'kube:admin', description: 'Identity Provider')
+        string(name:'OC_IDP_CONFIGURED', defaultValue: 'true', description: 'Is Identity Provider configured')
         string(name:'OC_CLUSTER_USER', defaultValue: 'kubeadmin', description: 'OCP Hub User Name')
         string(name:'OC_HUB_CLUSTER_PASS', defaultValue: '', description: 'OCP Hub Password')
         string(name:'OC_HUB_CLUSTER_API_URL', defaultValue: 'https://api.abutt-mycluster01.dev09.red-chesterfield.com:6443', description: 'OCP Hub API URL')
@@ -36,6 +37,7 @@ pipeline {
                 export CYPRESS_BASE_URL="${params.BASE_URL}"
                 export CYPRESS_OPTIONS_HUB_USER="${params.OC_CLUSTER_USER}"
                 export CYPRESS_OPTIONS_HUB_PASSWORD="${params.OC_HUB_CLUSTER_PASS}"
+                export CYPRESS_OC_IDP_CONFIGURED="${params.OC_IDP_CONFIGURED}"
                 if [[ -z "${OC_CLUSTER_USER}" || -z "${OC_HUB_CLUSTER_PASS}" || -z "${OC_HUB_CLUSTER_API_URL}" ]]; then
                     echo "Aborting test.. OCP/ACM connection details are required for the test execution"
                     exit 1
