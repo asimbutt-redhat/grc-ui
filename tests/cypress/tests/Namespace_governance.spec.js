@@ -11,6 +11,6 @@ describeT('RHACM4K-1725: GRC UI: [P1][Sev1][console] Namespace policy governance
 describeT('RHACM4K-1725: GRC UI: [P1][Sev1][console] Namespace policy governance', () => {
     test_genericPolicyGovernance('Namespace_governance/policy-config.yaml', 'Namespace_governance/violations-inform.yaml', 'Namespace_governance/violations-enforce.yaml')
 })
-describeT('RHACM4K-1725: GRC UI:[P1][Sev1][console] Namespace policy governance - clean up', () => {
+describeT('RHACM4K-1725: GRC UI: [P1][Sev1][console] Namespace policy governance - clean up', () => {
     test_applyPolicyYAML('Namespace_governance/Namespace_specification_cleanup_policy_raw.yaml')
 })
